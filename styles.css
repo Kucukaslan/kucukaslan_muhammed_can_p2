@@ -1,0 +1,38 @@
+:root {
+    --label-font: bold 18px Garamond;
+    --body-font: 16px "Times New Roman";
+    --small-padding: 8px;
+    --default-padding: 12px;
+    --default-margin: 12px;
+
+}
+
+.navbar{
+    background-color: black;
+    margin: 0;
+    padding: 12px;
+    color: azure;
+    font: 18px sans-serif;
+}
+body{ font: var(--body-font); }
+
+label{ font:  var(--label-font);}
+#centerwrapper {
+    text-align: center;
+}
+#centerdiv { 
+    display: inline-block; 
+    padding: var(--default-padding);
+}
+.form-group {
+    margin: var(--default-margin);
+}
+
+.button_submit{
+    background-color: green;
+    color : white;
+    font: 14px "Times New Roman";
+    padding: var(--small-padding);
+    padding-left: var(--default-padding);
+    padding-right: var(--default-padding);
+}
