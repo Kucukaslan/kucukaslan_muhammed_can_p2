@@ -33,7 +33,7 @@
         header("location: ./login");
     }
     else{
-        echo "<h3> <abbr title='Your Majesties, Your Excellencies, Your Highnesses'>Hey</> ". $_SESSION['cname']." </h3>";
+        echo "<h3> <abbr title='Your Majesties, Your Excellencies, Your Highnesses'>Hey</abbr> ". $_SESSION['cname']." </h3>";
         echo "<i> Welcome to the <abbr title='arguably'>smallest</abbr> e-market, <abbr title='of course by'> <b>ever</b></abbr>!</i>";
         $cid = $_SESSION['cid'];
         $wallet_sql = "SELECT `wallet` FROM `customer` WHERE `cid` = '". $cid."' ; ";
