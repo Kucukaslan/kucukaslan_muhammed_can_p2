@@ -25,10 +25,11 @@
 body{ font: var(--body-font); }
 
 label{ font:  var(--label-font);}
-#centerwrapper {
+
+.centerwrapper {
     text-align: center;
 }
-#centerdiv { 
+.centerdiv {
     display: inline-block; 
     padding: var(--default-padding);
 }

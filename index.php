@@ -17,13 +17,13 @@
 </header>
 -->
 <div class="container">
-    <nav class="navbar">
-        Customer welcome page
-        <a class="navbar-text" href="" >Dashboard</a>
+    <header class="navbar">
+        <a class=\"navbar-text\" href=".">Dashboard</a>
+        <a class="navbar-text" href="profile" >Profile</a>
         <a class="navbar-text" href="logout.php" id="logout" >Logout</a>
-    </nav>
+    </header>
 
-    <p >
+    <p id='info'>
     <?php
     // D:\drive\Bilkent\2020-2021_Summer\staj\db\vcs - Kopya
     include("config.php");
@@ -33,31 +33,77 @@
         header("location: ./login");
     }
     else{
-        echo "<h3> <abbr title='Your Majesties, Your Excellencies, Your Highnesses'>Hey</abbr> ". $_SESSION['cname']." </h3>";
-        echo "<i> Welcome to the <abbr title='arguably'>smallest</abbr> e-market, <abbr title='of course by'> <b>ever</b></abbr>!</i>";
         $cid = $_SESSION['cid'];
         $wallet_sql = "SELECT `wallet` FROM `customer` WHERE `cid` = '". $cid."' ; ";
         $res = $conn->query($wallet_sql);
         $wallet = $res->fetch()['wallet']; //$_SESSION['wallet'];
         $_SESSION['wallet'] = $wallet;
-        echo "</br>You have " . $wallet ." &#8378 </br>";
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['pid']) && isset($_POST['amount'])) {
+            $pid = $_POST['pid'];
+            $sql = "select price, stock from product where pid = '" . $_POST['pid'] . "';";
+            $result = $conn->query($sql);
+            $price = 0;
+            $stock = 0;
+            $amount = $_POST['amount'] == "" ? 0 : $_POST['amount'];
+            if ($datum = $result->fetch()) {
+                $price = $datum['price'];
+                $stock = $datum['stock'];
+
+            }
+            $cost = round($amount * $price, 2,1);
+            if ($wallet < $cost) {
+                echo "<script type='text/javascript'>alert('You do not have enough money in your account');</script>";
+            } else if ($stock < $amount) {
+                echo "<script type='text/javascript'>
+                       alert('There is not enough of the items you requested. Only "
+                    . $stock . " items are in stock.');</script>";
+            } else {
+
+                try {
+                    //echo "<script type='text/javascript'>alert('Entered Correct Place');</script>";
+                    // deduce the money =  $wallet -$cost;
+                    $sql = "UPDATE `customer` SET `wallet`=`wallet` -" . $cost . " WHERE `cid` ='" . $cid . "'; ";
+                    // deduce the stock
+                    $sql = $sql . " UPDATE `product` SET `stock`= `stock` - "
+                        . $amount . " WHERE `pid`='" . $pid . "'; ";
+
+                    // Insert buy data
+                    $sql = $sql . " INSERT INTO `buy`(`cid`, `pid`, `quantity`) VALUES ( '" . $cid . "' , '" . $pid . "', " . $amount . " );";
+
+                    $res = $conn->query($sql);
+                    echo "<script type='text/javascript'>alert('You have succesfully bought ".$amount." ".$pid.".!');</script>";
+
+                    // Update Wallet
+                    $res->fetchAll();
+                    $wallet_sql = "SELECT `wallet` FROM `customer` WHERE `cid` = '". $cid."' ; ";
+                    $res = $conn->query($wallet_sql);
+                    $wallet = $res->fetch()['wallet']; //$_SESSION['wallet'];
+                    $_SESSION['wallet'] = $wallet;
+                } catch (PDOException $e) {
+                    echo "<script > console.log('" . $e->getMessage() . "\n" . $e->getTraceAsString() . "')</script>";
+                }
+            }
+        }
+        echo "<h3> <abbr title='Your Majesties, Your Excellencies, Your Highnesses'>Hey</abbr> ". $_SESSION['cname']." </h3>";
+        echo "<i> Welcome to the <abbr title='arguably'>smallest</abbr> e-market, <abbr title='of course by us'> <b>ever</b></abbr>!</i>";
+        echo "<p>You have " . $wallet ." &#8378 </br></p>";
 
     }
 
     ?>
     </p>
-    <div id="centerwrapper">
-        <div id="centerdiv">
+    <div class="centerwrapper">
+        <div class="centerdiv">
             <br><br>
             <?php
             try {
                 try {
-                    $sql_list = "select * from product";
+                    $sql_list = "select * from product where stock > 0";
                     $result = $conn->query($sql_list);
                 } catch (PDOException $ex ){
                     echo $ex->getMessage();
                     sleep(1);
-                    $sql_list = "select * from product";
+                    $sql_list = "select * from product where stock > 0";
                     $result = $conn->query($sql_list);
                 }
             echo "<table style=\"width:100%\">";
@@ -88,52 +134,11 @@
             ?>
         </div>
     </div>
+
+    <form method='post' action="/profile"><div class="form-group">
+            <input type="submit" class="button button_submit" value="Go to Profile Page">
+        </div> </form>
 </div>
 </body>
 </html>
 
-<?php
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['pid']) && isset($_POST['amount'])) {
-    $pid = $_POST['pid'];
-    $sql = "select price, stock from product where pid = '".$_POST['pid']."';";
-    $result = $conn->query($sql);
-    $price = 0;
-    $stock = 0;
-    $amount = $_POST['amount'] == "" ? 0 : $_POST['amount'];
-    if($datum = $result->fetch()){
-        $price = $datum['price'];
-        $stock = $datum['stock'];
-
-    }
-    $cost = $amount * $price;
-    if ( $wallet < $cost ) {
-        echo "<script type='text/javascript'>alert('You do not have enough money in your account');</script>";
-    }
-    else if( $stock < $amount) {
-        echo "<script type='text/javascript'>
-                       alert('There is not enough of the items you requested. Only "
-            .$stock. " items are in stock.');</script>";
-    }
-    else {
-
-        try {
-            //echo "<script type='text/javascript'>alert('Entered Correct Place');</script>";
-            // deduce the money =  $wallet -$cost;
-            $sql = "UPDATE `customer` SET `wallet`=`wallet` -".$cost." WHERE `cid` ='". $cid."'; ";
-            // deduce the stock
-            $sql = $sql." UPDATE `product` SET `stock`= `stock` - "
-                .$amount." WHERE `pid`='".$pid."'; ";
-
-            // Insert buy data
-            $sql = $sql." INSERT INTO `buy`(`cid`, `pid`, `quantity`) VALUES ( '".$cid."' , '".$pid."', ".$amount." );";
-
-            $res = $conn->query($sql);
-            $res->fetchAll();
-
-            header("Refresh:0");
-        } catch (PDOException $e) {
-            echo "<script > console.log('". $e->getMessage()."\n".$e->getTraceAsString()."')</script>";
-        }
-    }
-}
-?>

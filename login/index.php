@@ -58,8 +58,8 @@
         <h4 class="navbar-text">Simple, very very simple, e-trade app</h4>
     </nav>
 
-    <div id="centerwrapper">
-        <div id="centerdiv">
+    <div class="centerwrapper">
+        <div class="centerdiv">
             <br><br>
             <h2>Login to Market</h2>
             <p>Please enter your username and password to login.</p>
