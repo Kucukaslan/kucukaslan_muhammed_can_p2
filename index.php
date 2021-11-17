@@ -68,9 +68,12 @@
                         . $amount . " WHERE `pid`='" . $pid . "'; ";
 
                     // Insert buy data
-                    $sql = $sql . " INSERT INTO `buy`(`cid`, `pid`, `quantity`) VALUES ( '" . $cid . "' , '" . $pid . "', " . $amount . " );";
 
+                    $sql = $sql . "INSERT INTO `buy`(`cid`, `pid`, `quantity`) VALUES ( '" . $cid . "' , '" . $pid . "', " . $amount . " )"
+                        ." ON DUPLICATE KEY UPDATE  `quantity` = `quantity` + ".$amount
+                        ." ;";
                     $res = $conn->query($sql);
+
                     echo "<script type='text/javascript'>alert('You have succesfully bought ".$amount." ".$pid.".!');</script>";
 
                     // Update Wallet
@@ -135,7 +138,7 @@
         </div>
     </div>
 
-    <form method='post' action="/profile"><div class="form-group">
+    <form method='post' action="./profile"><div class="form-group">
             <input type="submit" class="button button_submit" value="Go to Profile Page">
         </div> </form>
 </div>
