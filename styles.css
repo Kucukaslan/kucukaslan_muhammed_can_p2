@@ -20,8 +20,14 @@
 }
 
 #logout{
+    alignment: right;
     color: red;
 }
+
+a:link { 			color: white; 		}
+a:visited{ 			color: white; 		}
+a:hover{ 			color: hotpink; 		}
+
 body{ font: var(--body-font); }
 
 label{ font:  var(--label-font);}

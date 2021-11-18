@@ -69,34 +69,20 @@
 
                 <div class="form-group">
                     <label for="username">Username</label> <br>
-                    <input type="text" name="username" class="form-control" id="username">
+                    <input type="text" name="username" class="form-control" id="username" required='true'>
 
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label><br>
-                    <input type="password" name="password" class="form-control" id="password">
+                    <input type="password" name="password" class="form-control" id="password" required='true'>
 
                 </div>
                 <div class="form-group">
-                    <input type="submit" onclick="checkEmptyAndLogin()" class="button button_submit" value="Login">
+                    <input type="submit"  class="button button_submit" value="Login">
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-
-<script type="text/javascript">
-    function checkEmptyAndLogin() {
-        let usernameVal = document.getElementById("username").value;
-        let passwordVal = document.getElementById("password").value;
-        if (usernameVal === "" || passwordVal === "") {
-            alert("Some fields are empty!");
-        }
-        else {
-            document.getElementById("loginForm").submit();
-        }
-    }
-</script>
 </body>
 </html>
