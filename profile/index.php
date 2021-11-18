@@ -47,10 +47,22 @@
                 $pid = $_POST['pid'];
                 $cid = $_POST['cid'];
                 $quantity = $_POST['quantity'];
+                $price = $_POST['price'];
 
-                // DOES NOT UPDATES THE WALLET!
-                $sql_return = "DELETE FROM `buy`  WHERE `cid` = '" .$cid
-                    . "' AND`pid` = '" .$pid  . "' AND `quantity` = '" .$quantity  . "' ;";
+                // UPDATE buy Table
+                $sql_return = "UPDATE `buy` SET `quantity` = `quantity` - " .$quantity
+                    ." WHERE `cid` = '" .$cid
+                    . "' AND`pid` = '" .$pid. "'  ;";
+                // delete the row if all products are returned
+                $sql_return = $sql_return. " DELETE FROM `buy` WHERE `quantity` < 1 ;";
+                // Update stock
+                $sql_return = $sql_return." UPDATE `product` SET `stock` = `stock` + "
+                .$quantity." WHERE `pid` = '".$pid."';";
+                // Update wallet
+                $sql_return = $sql_return." UPDATE `customer` SET `wallet` = `wallet` + "
+                .round( $quantity * $price, 2, PHP_ROUND_HALF_UP)
+                    ." WHERE `cid` = '" .$cid."' ;";
+
                 $conn->query($sql_return);
                 echo "<script type='text/javascript'>alert('You have succesfully returned " . $quantity." of ".$pid.". ');</script>";
 
@@ -77,7 +89,7 @@
         echo "</br>You have " . $wallet ." &#8378 </br>";
 
         echo "<form method=\"post\" action=\"index.php\"> 
-                            <input type=\"number\" min='10' step='5' required='true' name=\"deposit_amount\">
+                            <input type=\"number\" min='10' step='0.05' required='true' name=\"deposit_amount\">
                             <input type=\"hidden\" name=\"cid\"  required='true' value=" . $cid . "></td>"
             . "<td><input type='submit' class='button_submit' value='Deposit'></form>";
 
@@ -95,6 +107,7 @@
                         . "<th>" . "Price" . "</th>"
                         . "<th>" . "Amount" . "</th>"
                         . "<th>" . "Total Cost" . "</th>"
+                        . "<th>" . "Amount to be Returned" . "</th>"
                         . "</tr>";
                     while ($row = $result->fetch()) {
                         echo "<tr>"
@@ -103,10 +116,11 @@
                             . "<td>" . $row['price'] . "</td>"
                             . "<td>" .  $row['quantity'] . "</td>"
                             . "<td>" . round($row['total_cost'], 2, PHP_ROUND_HALF_UP) . "</td>"
-                            . "<td> <form method=\"post\" action=\"index.php\"> 
-                                    <input type=\"hidden\" name=\"pid\" value=" . $row['pid'] . "></td>
-                                    <input type=\"hidden\" name=\"cid\" value=" . $cid . "></td>
-                                    <input type=\"hidden\" name=\"quantity\" value=" . $row['quantity']. "></td>"
+                            . "<form method=\"post\" action=\"index.php\"> 
+                                    <input type=\"hidden\" name=\"pid\" value=" . $row['pid'] . ">
+                                    <input type=\"hidden\" name=\"cid\" value=" . $cid . ">
+                                    <input type=\"hidden\" name=\"price\" value=" . $row['price'] . ">
+                                    <td><input type=\"number\" name=\"quantity\" min=1 max='".$row['quantity']."' ></td>"
                             . "<td><input type='submit' class='button_submit' value='Return'></form></td>";
                         echo "</tr>";
                     }
